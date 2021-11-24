@@ -1,0 +1,14 @@
+type Query {
+  info: String!
+  auditions: [Audition!]!
+}
+
+type Mutation {
+  post(location: String!, description: String!): Audition!
+}
+
+type Audition {
+  id: ID!
+  description: String!
+  location: String!
+}

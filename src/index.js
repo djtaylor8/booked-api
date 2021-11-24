@@ -1,22 +1,7 @@
 const { ApolloServer } = require('apollo-server');
+const fs = require('fs');
+const path = require('path');
 
-// 1
-const typeDefs = `
-  type Query {
-    info: String!
-    auditions: [Audition!]!
-  }
-
-  type Mutation {
-    post(location: String!, description: String!): Audition!
-  }
-
-  type Audition {
-      id: ID!
-      description: String!
-      location: String!
-  }
-`
 let auditions = [{
     id: 'audition-0',
     location: 'Sample Casting Agency',
@@ -29,16 +14,26 @@ const resolvers = {
     info: () => `This is the Booked API test`,
     auditions: () => auditions,
   },
-  Audition: {
-      id: (parent) => parent.id,
-      description: (parent) => parent.description,
-      location: (parent) => parent.location,
-  }
+  Mutation: {
+    post: (parent, args) => {
+        let idCount = auditions.length
+            const audition = {
+                id: `audition-${idCount++}`,
+                description: args.description,
+                location: args.location,
+            }
+            auditions.push(audition)
+            return audition
+    }
+  },
 }
 
 // 3
 const server = new ApolloServer({
-  typeDefs,
+  typeDefs: fs.readFileSync(
+      path.join(__dirname, 'schema.graphql'),
+      'utf8'
+  ),
   resolvers,
 })
 
