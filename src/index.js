@@ -1,40 +1,39 @@
 const { ApolloServer } = require('apollo-server');
+const { PrismaClient } = require('@prisma/client');
 const fs = require('fs');
 const path = require('path');
 
-let auditions = [{
-    id: 'audition-0',
-    location: 'Sample Casting Agency',
-    description: 'Frightened Inmate #2'
-  }]
+const prisma = new PrismaClient();
 
-// 2
 const resolvers = {
   Query: {
     info: () => `This is the Booked API test`,
-    auditions: () => auditions,
+    auditions: async (parent, args, context) => {
+      return context.prisma.audition.findMany()
+    },
   },
   Mutation: {
-    post: (parent, args) => {
-        let idCount = auditions.length
-            const audition = {
-                id: `audition-${idCount++}`,
-                description: args.description,
-                location: args.location,
-            }
-            auditions.push(audition)
-            return audition
-    }
+    post: (parent, args, context, info) => {
+        const newAudition = context.prisma.audition.create({
+          data: {
+            location: args.location,
+            description: args.description,
+          },
+        })
+        return newAudition
+    },
   },
 }
 
-// 3
 const server = new ApolloServer({
   typeDefs: fs.readFileSync(
       path.join(__dirname, 'schema.graphql'),
       'utf8'
   ),
   resolvers,
+  context: {
+    prisma,
+  }
 })
 
 server
