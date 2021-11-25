@@ -28,13 +28,15 @@ async function login(parent, args, context, info) {
 async function post(parent, args, context, info) {
     const { userId } = context;
 
-    return await context.prisma.audition.create({
+    const newAudition = await context.prisma.audition.create({
         data: {
             location: args.location,
             description: args.description,
             createdBy: { connect: { id: userId } },
         }
     })
+    context.pubsub.publish("NEW_AUDITION", newAudition)
+    return newAudition
 }
 
 module.exports = {
