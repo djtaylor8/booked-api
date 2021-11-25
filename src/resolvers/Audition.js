@@ -1,7 +1,7 @@
-function auditions(parent, args, context) {
-    return context.prisma.audition.findMany()
+function createdBy(parent, args, context) {
+    return context.prisma.audition.findUnique({ where: { id: parent.id } }).createdBy()
 }
 
 module.exports = {
-    auditions,
+    createdBy,
 }
