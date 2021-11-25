@@ -14,10 +14,15 @@ async function login(parent, args, context, info) {
         throw new Error('No such user found')
     }
     const token = jwt.sign({ userId: user.id }, APP_SECRET)
-    
+
     return {
-        signup,
-        login,
-        post,
+        token,
+        user,
     }
+}
+
+module.exports = {
+    signup,
+    login,
+    post,
 }
